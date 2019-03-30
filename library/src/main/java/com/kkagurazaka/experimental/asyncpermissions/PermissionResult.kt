@@ -1,6 +1,7 @@
 package com.kkagurazaka.experimental.asyncpermissions
 
-import kotlinx.coroutines.experimental.suspendCancellableCoroutine
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 
 sealed class PermissionResult {
 
