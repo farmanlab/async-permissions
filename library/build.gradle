@@ -1,14 +1,30 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'maven'
 
+def repo = new File(rootDir, "repository")
 android {
     compileSdkVersion 28
 
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 28
+    }
+
+    packagingOptions {
+        exclude 'assets/*'
+    }
+    
+    libraryVariants.all { variant ->
+        variant.outputs.all { output ->
+            output.packageLibrary.exclude("libs/*")
+            if (variant.name == android.buildTypes.release.name) {
+                outputFileName = output.outputFile.name.replace(("-release.aar"), "-${version}.aar")
+            } else if (variant.name == android.buildTypes.debug.name) {
+                outputFileName = output.outputFile.name.replace((".aar"), "-${version}.aar")
+            }
+        }
     }
 }
 
@@ -18,4 +34,16 @@ dependencies {
 
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
+}
+
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository url: "file://${repo.absolutePath}"
+            pom.version = VERSION_NAME             // version
+            pom.groupId = 'com.farmanlab'    // グループ名
+            pom.artifactId = 'async-permissions' // ライブラリ名
+        }
+    }
 }
