@@ -30,3 +30,17 @@ sealed class PermissionResult {
 
     data class NeverAskAgain(override val permissions: List<String>) : PermissionResult()
 }
+
+fun PermissionResult.onResult(
+    onGranted: (PermissionResult.Granted) -> Unit,
+    onDenied: ((PermissionResult.Denied) -> Unit)? = null,
+    onShouldShowRationale: ((PermissionResult.ShouldShowRationale) -> Unit)? = null,
+    onNeverAskAgain: ((PermissionResult.NeverAskAgain) -> Unit)? = null
+) {
+    when(this) {
+        is PermissionResult.Granted -> onGranted(this)
+        is PermissionResult.Denied -> onDenied?.invoke(this)
+        is PermissionResult.ShouldShowRationale -> onShouldShowRationale?.invoke(this)
+        is PermissionResult.NeverAskAgain -> onNeverAskAgain?.invoke(this)
+    }
+}
